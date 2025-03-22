@@ -1,0 +1,67 @@
+// TESTING: Listen for messages from the popup script doBackgroundScript
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "FROM_POPUP") {
+    // Handle the message from the popup script
+    console.log("Message from popup:", message.data);
+
+    // Send a response back to the popup script
+    sendResponse({ type: "FROM_BACKGROUND", data: "Hello from background script!" });
+  }
+
+  return true;
+});
+
+// Listen for connections from the content script
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "content<>background") {
+    port.onMessage.addListener((message, port) => {
+      if (message.type === "FROM_CONTENT_TO_BG") {
+        // Handle the message from the content script
+
+        // verify port info
+        console.log("Port info:", port);
+        const originUrl = port.sender?.origin ?? port.sender?.url;
+        if (!port.sender?.tab?.id || !originUrl) {
+          return console.error("Missing data from sender tab.");
+        }
+
+        // optional: send a message back to the content script
+        // port.postMessage({ type: "FROM_BG_TO_CONTENT", data: "bg to content" });
+
+        openPopupConfirmation({ message, port });
+      }
+    });
+  }
+});
+
+async function openPopupConfirmation({ message, port }) {
+  return new Promise((resolve) => {
+    chrome.windows.getCurrent({ populate: false }, async (currentWindow) => {
+      console.log("Current window:", currentWindow);
+
+      if (port.sender.tab.windowId !== currentWindow.id) {
+        return console.error("Sender tab is not the current window.");
+      }
+
+      let params = new URLSearchParams({
+        tabId: String(port.sender?.tab?.id ?? 0),
+        payload: encodeURIComponent(JSON.stringify(message)),
+      });
+
+      const popupConfirmation = await chrome.windows.create(
+        {
+          url: chrome.runtime.getURL("../index.html") + `?${params.toString()}`,
+          type: "popup",
+          width: 390,
+          height: 600,
+          focused: true,
+        },
+        (newWindow) => {
+          console.log("New window created:", newWindow);
+        }
+      );
+
+      resolve(popupConfirmation);
+    });
+  });
+}
