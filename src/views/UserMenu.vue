@@ -20,11 +20,4 @@ function handleUserHome() {
   </section>
 </template>
 
-<style scoped>
-.start-page {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-</style>
+<style scoped></style>

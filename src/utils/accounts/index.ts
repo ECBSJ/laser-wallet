@@ -1,11 +1,11 @@
-import { generateNewAccount, generateWallet, randomSeedPhrase } from "@stacks/wallet-sdk";
+import { generateNewAccount, generateWallet } from "@stacks/wallet-sdk";
 import { privateKeyToAddress, privateKeyToPublic } from "@stacks/transactions";
 import { c32ToB58 } from "c32check";
 import { Buffer } from "buffer";
 import ecc from "@bitcoinerlab/secp256k1";
 import { type Account } from "../types";
-import type { Ref } from "vue";
 
+// generates the first 20 accounts for the user
 async function generateInitialAccounts(mnemonic: string) {
   let wallet = await generateWallet({
     secretKey: mnemonic!,
@@ -50,8 +50,10 @@ async function generateInitialAccounts(mnemonic: string) {
   return accounts;
 }
 
+// generates the bitcoin P2TR (taproot) address for the user
 async function generateP2TR(pubkey: String) {
   // @ts-ignore
+  // `bitcoin` is a global variable injected by the `bitcoinjs-lib.js` script in the root directory
   bitcoin.initEccLib(ecc);
 
   // @ts-ignore
@@ -64,53 +66,4 @@ async function generateP2TR(pubkey: String) {
   return taproot.address;
 }
 
-let totalAdd = 0;
-const c32_regex = /^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]+$/;
-let workerThread: any[] = [];
-
-async function generateVanity(
-  userinput: string,
-  vanityResult: Ref<object>,
-  isVanityGenerating: Ref<boolean>,
-  mnemonic: Ref<string>
-) {
-  isVanityGenerating.value = true;
-
-  totalAdd = 0;
-
-  let userVanity = userinput.toUpperCase();
-
-  if (c32_regex.test(userVanity)) {
-    for (let index = 0; index < navigator.hardwareConcurrency; index++) {
-      const worker = new Worker(new URL("/public/worker.js", import.meta.url), {
-        type: "module",
-      });
-
-      worker.onmessage = function (e) {
-        if (e.data.status === "success") {
-          for (let p = 0; p < workerThread.length; p++) {
-            console.log("Terminating worker thread: " + p);
-            workerThread[p].terminate();
-          }
-
-          console.log(`Worker thread ${e.data.worker} found the vanity address`);
-          console.log(e.data);
-          isVanityGenerating.value = false;
-          vanityResult.value = e.data.treasure;
-          mnemonic.value = e.data.treasure.vanityPrivKey;
-        }
-
-        if (e.data.status === "searching") {
-          totalAdd = totalAdd + 100;
-        }
-      };
-
-      worker.postMessage({ index: index, vanity: userVanity });
-      workerThread.push(worker);
-    }
-  } else {
-    console.log("Invalid characters. Try again.");
-  }
-}
-
-export { generateInitialAccounts, generateVanity, generateP2TR };
+export { generateInitialAccounts, generateP2TR };

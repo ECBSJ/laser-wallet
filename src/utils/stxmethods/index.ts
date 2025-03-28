@@ -10,23 +10,9 @@ import {
 import { generateWallet } from "@stacks/wallet-sdk";
 import { c32ToB58 } from "c32check";
 import { generateP2TR } from "../accounts";
+import { hashUint8Array } from "../helpers";
 
-async function hashUint8Array(data: Uint8Array) {
-  if (!(data instanceof Uint8Array)) {
-    throw new Error("Input must be a Uint8Array");
-  }
-
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-  const hashArray = new Uint8Array(hashBuffer);
-
-  const hashHex = Array.from(hashArray)
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-
-  return hashHex;
-}
-
+// handles method stx_signMessage
 async function handleSignMessage(message: string, mnemonic: string, accountIndex: number) {
   let wallet = await generateWallet({
     secretKey: mnemonic,
@@ -60,6 +46,7 @@ async function handleSignMessage(message: string, mnemonic: string, accountIndex
   };
 }
 
+// handles method getAddresses
 async function handleGetAddresses(mnemonic: string, accountIndex: number) {
   let wallet = await generateWallet({
     secretKey: mnemonic,
@@ -103,6 +90,7 @@ async function handleGetAddresses(mnemonic: string, accountIndex: number) {
   };
 }
 
+// handles method stx_callContract
 async function handleCallContract(params: object, mnemonic: string, accountIndex: number) {
   let wallet = await generateWallet({
     secretKey: mnemonic,
@@ -140,4 +128,4 @@ async function handleCallContract(params: object, mnemonic: string, accountIndex
   };
 }
 
-export { hashUint8Array, handleSignMessage, handleGetAddresses, handleCallContract };
+export { handleSignMessage, handleGetAddresses, handleCallContract };

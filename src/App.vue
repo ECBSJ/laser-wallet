@@ -26,7 +26,7 @@ onBeforeMount(() => {
   <div v-if="payload">
     <Confirmation :payload="payload" :tabId="tabId" />
   </div>
-  <!-- else the RouterView component will handle the viewing of the normal wallet views -->
+  <!-- else the RouterView component will handle the viewing of the normal wallet extension views -->
   <div style="height: 100%" v-else>
     <RouterView />
   </div>

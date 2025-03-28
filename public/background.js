@@ -1,22 +1,9 @@
-// TESTING: Listen for messages from the popup script doBackgroundScript
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "FROM_POPUP") {
-    // Handle the message from the popup script
-    console.log("Message from popup:", message.data);
-
-    // Send a response back to the popup script
-    sendResponse({ type: "FROM_BACKGROUND", data: "Hello from background script!" });
-  }
-
-  return true;
-});
-
-// Listen for connections from the content script
+// listen for connections from the content script
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === "content<>background") {
     port.onMessage.addListener((message, port) => {
       if (message.type === "FROM_CONTENT_TO_BG") {
-        // Handle the message from the content script
+        // handle the message from the content script
 
         // verify port info
         console.log("Port info:", port);
@@ -26,7 +13,7 @@ chrome.runtime.onConnect.addListener((port) => {
         }
 
         // optional: send a message back to the content script
-        // port.postMessage({ type: "FROM_BG_TO_CONTENT", data: "bg to content" });
+        // port.postMessage({ type: "FROM_BG_TO_CONTENT", data: "Background received data!" });
 
         openPopupConfirmation({ message, port });
       }
@@ -34,6 +21,8 @@ chrome.runtime.onConnect.addListener((port) => {
   }
 });
 
+// opens a popup confirmation window which
+// triggers the Confirmation.vue component to open
 async function openPopupConfirmation({ message, port }) {
   return new Promise((resolve) => {
     chrome.windows.getCurrent({ populate: false }, async (currentWindow) => {
@@ -65,3 +54,16 @@ async function openPopupConfirmation({ message, port }) {
     });
   });
 }
+
+// listens for messages from the extension popup script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "FROM_POPUP") {
+    // Handle the message from the popup script
+    console.log("Message from popup:", message.data);
+
+    // Send a response back to the popup script
+    sendResponse({ type: "FROM_BACKGROUND", data: "Hello from background script!" });
+  }
+
+  return true;
+});

@@ -11,12 +11,16 @@ let accountIndexToDisplay = ref(0);
 onBeforeMount(async () => {
   const mnemonic = localStorage.getItem("mnemonic");
 
+  // if no mnemonic, redirect to start page
   if (!mnemonic) {
     router.push({ path: "/" });
   }
 
+  // generate initial 20 accounts from the mnemonic
   let accounts = await generateInitialAccounts(mnemonic!);
   userAccounts.value = accounts;
+
+  // todo: handle fetching of account balances and other network data
 });
 
 const handleOpenUserMenu = () => {
@@ -41,13 +45,13 @@ const handleOpenUserMenu = () => {
       />
     </div>
 
-    <div class="user-page-top">
+    <div class="page-top">
       <h1>Account {{ accountIndexToDisplay + 1 }}</h1>
       <small>Total Value</small>
       <div class="value-display">$1,000,000</div>
     </div>
 
-    <div class="user-page-bottom">
+    <div class="page-bottom">
       <small>Assets</small>
       <div class="assets-display">
         <div class="assets-display-row">
@@ -127,36 +131,5 @@ small {
   font-size: 3rem;
   font-weight: bolder;
   font-family: monospace;
-}
-
-.user-page-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.user-page-top {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-start;
-}
-
-.user-page-bottom {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  row-gap: 20px;
-}
-
-.user-page {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  row-gap: 30px;
 }
 </style>

@@ -1,4 +1,6 @@
-console.log("[LaserProvider] Attempting to inject LaserProvider...");
+// the content script is responsible for injecting the `injection.js` into the document page
+// and forwarding messages between the document page and the background script
+
 const script = document.createElement("script");
 script.src = chrome.runtime.getURL("injection.js");
 script.type = "module";
@@ -27,5 +29,5 @@ document.addEventListener("laserwallet_request", (event) => {
 
 // Listen for messages from the background script
 port.onMessage.addListener((message) => {
-  console.log("Message from background script back to content:", message.data);
+  console.log("Message from background script back to content script:", message.data);
 });

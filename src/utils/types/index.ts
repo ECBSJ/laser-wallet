@@ -1,3 +1,4 @@
+// type structure of the Account object for each user account
 type Account = {
   path: String;
   stxAddress: String;

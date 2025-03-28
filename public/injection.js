@@ -1,8 +1,12 @@
+// this script is injected into the webpage to provide the Laser Wallet provider to the app
+// it listens for messages from the app and forwards them to the background.js script for confirmation
 const LaserProvider = {
   isLaser: true,
 
+  // adherence to stacks/connect v8's JSON RPC 2.0 standard
+  // REFERENCE: https://wbips.netlify.app/wbips/WBIP001
   request: async function (method, params) {
-    // verify method is of correct type
+    // todo: verify literal method is of correct type
     let supportedMethods = [
       "getAddresses",
       "stx_signMessage",
@@ -20,7 +24,7 @@ const LaserProvider = {
     if (!supportedMethods.includes(method))
       return new Error(`Method ${method} is not supported by Laser Wallet.`);
 
-    // verify params are valid based on method type
+    // todo: verify params are valid based on method type
 
     // construct JSON RPC 2.0 request object
     const id = crypto.randomUUID();
@@ -32,10 +36,10 @@ const LaserProvider = {
     };
     console.log("[LaserProvider] Request for confirmation: ", rpcRequest);
 
-    // Dispatch custom event to content script with request details
+    // dispatch custom event to content script with request details
     document.dispatchEvent(new CustomEvent("laserwallet_request", { detail: rpcRequest }));
 
-    // Return a Promise that resolves or rejects based on the response of Laser Wallet
+    // return a Promise that resolves or rejects based on the response of wallet extension
     return new Promise(function (resolve, reject) {
       function handleMessageFromLaserProviderType(event) {
         const response = event.data;
@@ -57,6 +61,9 @@ const LaserProvider = {
 
 window.LaserProvider = LaserProvider;
 
+// registers the wallet extension provider with the global `wbip_providers` array
+// REFERENCE: https://wbips.netlify.app/wbips/WBIP004
+// this allows the stacks/connect v8 to recognize the provider and use it for confirming transactions
 window.wbip_providers = window.wbip_providers || [];
 window.wbip_providers.push({
   // `WbipProvider` type

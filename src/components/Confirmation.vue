@@ -12,12 +12,14 @@ onBeforeMount(() => {
     return;
   }
 
-  // todo: determine which account index user wallet is using
+  // todo: determine which account index user wallet is using and update accountIndex ref value
 
   mnemonic.value = storageMnemonic!;
 });
 
 // props being passed from App.vue
+// payload consists of the method and params to be executed
+// tabId is the id of the window tab that opened the popup
 let props = defineProps<{
   payload: Object;
   tabId: string;
@@ -26,6 +28,7 @@ let props = defineProps<{
 console.log(props.payload);
 console.log(props.tabId);
 
+// handleConfirm function to execute the method and params from the payload
 async function handleConfirm() {
   if (!props.tabId) return;
 
@@ -49,19 +52,19 @@ async function handleConfirm() {
       result = await handleCallContract(props.payload.params, mnemonic.value, accountIndex.value);
       break;
     case "stx_transferStx":
-      // handle transferStx
+      // todo: handle transferStx
       break;
     case "stx_transferSip10Ft":
-      // handle transferSip10Ft
+      // todo: handle transferSip10Ft
       break;
     case "stx_signTransaction":
-      // handle signTransaction
+      // todo: handle signTransaction
       break;
     case "stx_signStructuredMessage":
-      // handle signStructuredMessage
+      // todo: handle signStructuredMessage
       break;
     case "stx_deployContract":
-      // handle deployContract
+      // todo: handle deployContract
       break;
     case "signPsbt":
       // handle signPsbt
@@ -115,19 +118,5 @@ async function handleConfirm() {
 .confirmation-details {
   font-family: monospace;
   word-wrap: break-word;
-}
-.user-page-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.user-page {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  row-gap: 30px;
 }
 </style>

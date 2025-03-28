@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Laser-Wallet",
   "version": "1.0.0",
-  "description": "A Bitcoin L2 Wallet called Laser Wallet",
+  "description": "A Bitcoin Layer 2 Wallet called Laser Wallet",
   "action": {
     "default_popup": "index.html"
   },
